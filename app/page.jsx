@@ -43,7 +43,7 @@ const EduTrackLogin = () => {
     setIsLoading(true);
 
     console.log(formData)
-    const result = await axios.post("http://localhost:8000/v2/login",formData)
+    const result = await axios.post("https://rfid-server-dun.vercel.app/v2/login",formData)
     if(result.data.success == true){
       alert("Logged In")
       localStorage.setItem("id",result.data.data.id)

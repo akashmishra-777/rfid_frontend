@@ -84,7 +84,7 @@ const EduTrackRegister = () => {
     setIsLoading(true);
     console.log(formData)
     if(formData.role == "student"){
-        const result = await axios.post("http://localhost:8000/v2/register",formData,{
+        const result = await axios.post("https://rfid-server-dun.vercel.app/v2/register",formData,{
           headers: { "Content-Type": "application/json" }
         })
         if(result.data.success == true){
@@ -97,7 +97,7 @@ const EduTrackRegister = () => {
           setIsLoading(false);
         }
     }else{
-          const result = await axios.post("http://localhost:8000/v2/register",formData,{
+          const result = await axios.post("https://rfid-server-dun.vercel.app/v2/register",formData,{
           headers: { "Content-Type": "application/json" }
         })
         if(result.data.success == true){

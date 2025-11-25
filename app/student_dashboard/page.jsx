@@ -41,7 +41,7 @@ useEffect(()=>{
   const id = localStorage.getItem("id");
 
   (async()=>{
-    const result = await axios.post("http://localhost:8000/v3/get_student_data",{id:id})
+    const result = await axios.post("https://rfid-server-dun.vercel.app/v3/get_student_data",{id:id})
     if(result){
       setStudent(result.data.data[0])
       console.log(result.data.data[0])
@@ -56,7 +56,7 @@ useEffect(()=>{
   const id = localStorage.getItem("idx");
 
   (async()=>{
-    const result = await axios.post("http://localhost:8000/v1/get_total_attendence",{id:id})
+    const result = await axios.post("https://rfid-server-dun.vercel.app/v1/get_total_attendence",{id:id})
     if(result){
      
       setAtt(result.data.data)
