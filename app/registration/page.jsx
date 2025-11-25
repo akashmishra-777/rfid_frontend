@@ -1,6 +1,6 @@
 "use client"
 import React, { useState,useEffect } from 'react';
-
+import axios from 'axios';
 
 
 
@@ -20,7 +20,7 @@ import {
 
 const EduTrackRegister = () => {
   const [formData, setFormData] = useState({
-    userType: 'student',
+    role: 'student',
     id: '',
     name: '',
     email: '',
@@ -36,10 +36,10 @@ const EduTrackRegister = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const [branches,setBranches] = useState([]);
+  const [sections,setSections] = useState([]);
 
-  const branches = ['Computer Science', 'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering', 'Electronics'];
-  const sections = ['A', 'B', 'C', 'D'];
-  const departments = ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'English'];
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,11 +49,67 @@ const EduTrackRegister = () => {
     });
   };
 
+
+  useEffect(()=>{
+      (async ()=>{
+      const result = await axios.get("https://rfid-server-dun.vercel.app/v3/get_sections")
+      if(result){
+        setSections(result.data.result)
+        
+      }else{
+        alert("Error while fetching data from the server.")
+      }
+      })();
+  },[])
+
+
+   useEffect(()=>{
+      (async ()=>{
+      const result = await axios.get("https://rfid-server-dun.vercel.app/v3/get_branches")
+      if(result){
+        setBranches(result.data.result)
+        console.log(result.data.result)
+        
+      }else{
+        alert("Error while fetching data from the server.")
+      }
+      })();
+  },[])
+
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate API call
+    console.log(formData)
+    if(formData.role == "student"){
+        const result = await axios.post("http://localhost:8000/v2/register",formData,{
+          headers: { "Content-Type": "application/json" }
+        })
+        if(result.data.success == true){
+          alert(result.data.msg)
+          window.location = "/"
+          setIsLoading(false);
+          
+        }else{
+          alert(result.data.msg)
+          setIsLoading(false);
+        }
+    }else{
+          const result = await axios.post("http://localhost:8000/v2/register",formData,{
+          headers: { "Content-Type": "application/json" }
+        })
+        if(result.data.success == true){
+          alert(result.data.msg)
+          window.location = "/"
+          setIsLoading(false);
+          
+        }else{
+          alert(result.data.msg)
+          setIsLoading(false);
+        }
+    }
     setTimeout(() => {
       console.log('Registration attempt:', formData);
       setIsLoading(false);
@@ -77,7 +133,7 @@ const EduTrackRegister = () => {
       case 1:
         return formData.name && formData.email && formData.phone;
       case 2:
-        return formData.userType === 'student' 
+        return formData.role === 'student' 
           ? formData.branch && formData.section
           : formData.department;
       case 3:
@@ -194,9 +250,9 @@ const EduTrackRegister = () => {
                 <button
                   key={type.value}
                   type="button"
-                  onClick={() => setFormData({ ...formData, userType: type.value })}
+                  onClick={() => setFormData({ ...formData, role: type.value })}
                   className={`p-4 rounded-xl border-2 transition-all duration-200 transform hover:scale-105 ${
-                    formData.userType === type.value
+                    formData.role === type.value
                       ? `border-${type.color}-500 bg-${type.color}-50 text-${type.color}-700 shadow-sm`
                       : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                   }`}
@@ -221,7 +277,7 @@ const EduTrackRegister = () => {
                     <label className="text-sm font-semibold text-slate-700 tracking-wide flex items-center space-x-2">
                       <IdentificationIcon className="w-4 h-4" />
                       <span>
-                        {formData.userType === 'student' ? 'STUDENT ID' : 'STAFF ID'}
+                        {formData.role === 'student' ? 'STUDENT ID' : 'STAFF ID'}
                       </span>
                     </label>
                     <div className={`relative group transition-all duration-300 ${
@@ -239,7 +295,7 @@ const EduTrackRegister = () => {
                         onFocus={() => setFocusedField('id')}
                         onBlur={() => setFocusedField(null)}
                         className="block w-full pl-12 pr-6 py-4 border-2 border-slate-200 rounded-2xl bg-white/80 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-slate-900 placeholder-slate-500 text-base font-medium tracking-wide shadow-sm hover:shadow-md"
-                        placeholder={formData.userType === 'student' ? "STU2024001" : "STAFF2024001"}
+                        placeholder={formData.role === 'student' ? "STU2024001" : "STAFF2024001"}
                       />
                     </div>
                   </div>
@@ -294,7 +350,7 @@ const EduTrackRegister = () => {
                         onFocus={() => setFocusedField('email')}
                         onBlur={() => setFocusedField(null)}
                         className="block w-full pl-12 pr-6 py-4 border-2 border-slate-200 rounded-2xl bg-white/80 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-slate-900 placeholder-slate-500 text-base font-medium tracking-wide shadow-sm hover:shadow-md"
-                        placeholder={formData.userType === 'student' ? "student@university.edu" : "faculty@university.edu"}
+                        placeholder={formData.role === 'student' ? "student@university.edu" : "faculty@university.edu"}
                       />
                     </div>
                   </div>
@@ -332,7 +388,7 @@ const EduTrackRegister = () => {
             {/* Step 2: Academic Information */}
             {currentStep === 2 && (
               <div className="space-y-6 animate-fadeIn">
-                {formData.userType === 'student' ? (
+                {formData.role === 'student' ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Branch Field */}
                     <div className="space-y-3">
@@ -357,9 +413,10 @@ const EduTrackRegister = () => {
                           className="block w-full pl-12 pr-10 py-4 border-2 border-slate-200 rounded-2xl bg-white/80 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-slate-900 text-base font-medium tracking-wide shadow-sm hover:shadow-md appearance-none cursor-pointer"
                         >
                           <option value="">Select Branch</option>
-                          {branches.map(branch => (
-                            <option key={branch} value={branch}>{branch}</option>
-                          ))}
+                          {branches.map((branch)=>{
+                            
+                            return <option className='text-black' key={branch._id} value={branch.branchName}>{branch.branchName}</option>
+                          })},
                         </select>
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                           <ChevronDownIcon className="h-5 w-5 text-slate-400" />
@@ -390,9 +447,10 @@ const EduTrackRegister = () => {
                           className="block w-full pl-12 pr-10 py-4 border-2 border-slate-200 rounded-2xl bg-white/80 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-slate-900 text-base font-medium tracking-wide shadow-sm hover:shadow-md appearance-none cursor-pointer"
                         >
                           <option value="">Select Section</option>
-                          {sections.map(section => (
-                            <option key={section} value={section}>Section {section}</option>
-                          ))}
+                          {sections.map((section)=>{
+                            return <option key={section._id} value={section.sectionName} className='text-black'>{section.sectionName}</option>
+                            
+                          })}
                         </select>
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                           <ChevronDownIcon className="h-5 w-5 text-slate-400" />
@@ -424,9 +482,10 @@ const EduTrackRegister = () => {
                         className="block w-full pl-12 pr-10 py-4 border-2 border-slate-200 rounded-2xl bg-white/80 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-slate-900 text-base font-medium tracking-wide shadow-sm hover:shadow-md appearance-none cursor-pointer"
                       >
                         <option value="">Select Department</option>
-                        {departments.map(dept => (
-                          <option key={dept} value={dept}>{dept}</option>
-                        ))}
+                         {branches.map((branch)=>{
+                            
+                            return <option className='text-black' key={branch._id} value={branch.branchName}>{branch.branchName}</option>
+                          })},
                       </select>
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <ChevronDownIcon className="h-5 w-5 text-slate-400" />
@@ -442,7 +501,7 @@ const EduTrackRegister = () => {
                     <div>
                       <h4 className="font-semibold text-blue-800 text-sm">Academic Information</h4>
                       <p className="text-blue-700 text-sm mt-1">
-                        {formData.userType === 'student' 
+                        {formData.role === 'student' 
                           ? 'Your branch and section information will be used for class assignments and attendance tracking.'
                           : 'Your department information will determine your teaching assignments and access privileges.'
                         }
@@ -600,7 +659,7 @@ const EduTrackRegister = () => {
                 <button
                   type="button"
                   onClick={nextStep}
-                  disabled={!isStepValid()}
+ 
                   className="px-6 py-3 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transform hover:scale-105 transition-all duration-300 shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   Continue

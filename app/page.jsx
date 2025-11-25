@@ -1,5 +1,6 @@
 "use client"
-import React, { useState } from 'react';
+import  { useState,useEffect } from 'react';
+import axios from 'axios';
 import {
   EnvelopeIcon,
   LockClosedIcon,
@@ -14,7 +15,6 @@ const EduTrackLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    userType: 'student'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,11 +28,38 @@ const EduTrackLogin = () => {
     });
   };
 
+  useEffect(() => {
+    const id = localStorage.getItem("id")
+    const role = localStorage.getItem("role")
+    if(id && role == "student"){
+      window.location = "/student_dashboard"
+    }else if(id && role == "teacher"){
+       window.location = "/teacher_dashboard"
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate API call
+
+    console.log(formData)
+    const result = await axios.post("http://localhost:8000/v2/login",formData)
+    if(result.data.success == true){
+      alert("Logged In")
+      localStorage.setItem("id",result.data.data.id)
+      localStorage.setItem("name",result.data.data.name)
+      localStorage.setItem("role",result.data.data.role)
+      localStorage.setItem("idx",result.data.data.idx)
+      if(result.data.data.role == "student"){
+        window.location = "/student_dashboard"
+      }else{
+        window.location = "teacher_dashboard"
+      }
+       setIsLoading(false);
+    }else{
+      alert(result.data.msg)
+       setIsLoading(false);
+    }
     setTimeout(() => {
       console.log('Login attempt:', formData);
       setIsLoading(false);

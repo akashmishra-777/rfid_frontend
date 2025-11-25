@@ -36,6 +36,18 @@ const TeacherAttendanceDashboard = () => {
   // Set page title
   usePageTitle('Teacher Dashboard - EduTrack');
 
+  useEffect(()=>{
+      const role = localStorage.getItem("role");
+      if(role == "student"){
+         window.location = "/student_dashboard"
+      }
+        else if(role == "teacher"){
+       
+      }else{
+        window.location = "/"
+      }
+  },[])
+
   const [teacher, setTeacher] = useState({
     name: 'Dr. Sarah Johnson',
     id: 'TEA-2024-001',
